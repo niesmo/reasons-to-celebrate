@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import { Layout, Row, Col, DatePicker, Table, Divider } from 'antd'
+import { Layout, Row, Col, DatePicker, Table, Divider, Space } from 'antd'
 import { format } from 'date-fns'
 import { findSignificantDates } from '../lib/utils'
 import { Component } from 'react';
@@ -35,7 +35,7 @@ export default class Home extends Component {
     return (
       <>
         <Head>
-          <title>More Reasons To Celebrate</title>
+          <title>Reasons To Celebrate</title>
           <meta name="description" content="More reasons to celebrate" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
@@ -43,13 +43,18 @@ export default class Home extends Component {
         <Content>
           <main>
             <Row>
-              <Col span={8} offset={8}>
-                <h1>We all need more reasons to celebrate</h1>
-                <p>find the dates for your next celebration 🎉🥳</p>
-                <div>
-                  <p>Pick a date that's significat to you</p>
-                  <DatePicker onChange={this.datePicked}></DatePicker>
-                </div>
+              <Col span={12} offset={6}>
+                <p className={styles.banner}>Find more reasons to celebrate 🎉</p>
+                <Space size="large" align="center">
+                  <div>Pick a date</div>
+                  <DatePicker size="large" onChange={this.datePicked}></DatePicker>
+                </Space>
+                {/* <Row justify="space-around" align="middle">
+                  <Col span={4}>Pick a date</Col>
+                  <Col span={20}>
+                    <DatePicker size="large" onChange={this.datePicked}></DatePicker>
+                  </Col>
+                </Row> */}
                 <Divider />
                 <div>
                   <h3>Dates to celebrate:</h3>
@@ -57,8 +62,6 @@ export default class Home extends Component {
                 </div>
               </Col>
             </Row>
-
-  
           </main>
         </Content>
       </>
