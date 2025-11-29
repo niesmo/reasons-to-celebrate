@@ -70,6 +70,11 @@ export default function ReminderButton({
     };
 
     const handleToggleReminder = async (type: ReminderType) => {
+        if (!isNotificationSupported()) {
+            alert('Notifications are not supported in this browser. If you are on mobile, try adding this app to your home screen first.');
+            return;
+        }
+
         if (permission !== 'granted') {
             await handleRequestPermission();
             return;
@@ -113,9 +118,7 @@ export default function ReminderButton({
         }
     };
 
-    if (!isNotificationSupported()) {
-        return null;
-    }
+
 
     const hasAnyReminder = activeReminders.size > 0;
 
