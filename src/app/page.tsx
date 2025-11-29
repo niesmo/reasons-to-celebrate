@@ -5,6 +5,7 @@ import { format, parseISO, startOfDay } from 'date-fns';
 import confetti from 'canvas-confetti';
 import { getCelebrationDates, CelebrationDate } from '../utils/celebrationLogic';
 import CelebrationCard from '../components/CelebrationCard';
+import InstallPrompt from '../components/InstallPrompt';
 import { getSavedDates, saveDateWithName, deleteSavedDate, SavedDate } from '../utils/savedDatesStorage';
 
 export default function Home() {
@@ -198,6 +199,7 @@ export default function Home() {
           </div>
         )}
       </div>
+      <InstallPrompt />
     </main>
   );
 }
