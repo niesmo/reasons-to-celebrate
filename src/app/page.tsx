@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { format, parseISO, startOfDay } from 'date-fns';
 import confetti from 'canvas-confetti';
+import Link from 'next/link';
 import { getCelebrationDates, CelebrationDate } from '../utils/celebrationLogic';
 import CelebrationCard from '../components/CelebrationCard';
 import InstallPrompt from '../components/InstallPrompt';
+import NotificationChecker from '../components/NotificationChecker';
 import { getSavedDates, saveDateWithName, deleteSavedDate, SavedDate } from '../utils/savedDatesStorage';
 
 export default function Home() {
@@ -82,6 +84,27 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-900 text-slate-100 p-8 md:p-24">
       <div className="max-w-5xl mx-auto">
+        <div className="flex justify-end mb-8">
+          <Link
+            href="/about"
+            className="text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2 group hover:underline"
+          >
+            <span className="font-medium">About</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 transform group-hover:translate-x-1 transition-transform"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </Link>
+        </div>
+
         <header className="text-center mb-16">
           <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 mb-6 animate-pulse">
             Reasons to Celebrate
@@ -200,6 +223,7 @@ export default function Home() {
         )}
       </div>
       <InstallPrompt />
+      <NotificationChecker />
     </main>
   );
 }

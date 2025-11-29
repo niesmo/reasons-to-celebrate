@@ -8,6 +8,7 @@ export interface CelebrationDate {
   reason: string;
   type: 'repdigit' | 'palindrome' | 'sequential' | 'round' | 'other';
   priority: Priority;
+  originalDate: string; // ISO string of the original start date
 }
 
 const isRepdigit = (n: number): boolean => {
@@ -98,6 +99,7 @@ export const getCelebrationDates = (startDate: Date, count: number = 50): Celebr
         reason,
         type,
         priority,
+        originalDate: startDate.toISOString(),
       });
     }
     days++;

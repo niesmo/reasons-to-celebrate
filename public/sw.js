@@ -108,6 +108,29 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+    console.log('[SW] Notification clicked:', event.notification.tag);
+
+    event.notification.close();
+
+    // Open or focus the app
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+            // If a window is already open, focus it
+            for (const client of clientList) {
+                if (client.url === '/' && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // Otherwise, open a new window
+            if (clients.openWindow) {
+                return clients.openWindow('/');
+            }
+        })
+    );
+});
+
 // Handle messages from clients
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
