@@ -126,14 +126,14 @@ export default function Home() {
         )}
 
         {/* Date Input Section */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-8 px-4">
           <div className="relative group w-full max-w-md">
             <div className="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
             <input
               type="date"
               value={dateStr}
               onChange={handleDateChange}
-              className="relative block w-full rounded-lg border-0 bg-slate-800 py-4 px-6 text-white shadow-xl placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-lg sm:leading-6"
+              className="relative block w-full rounded-lg border-0 bg-slate-800 py-4 px-6 text-white shadow-xl placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 text-base sm:text-lg sm:leading-6"
             />
           </div>
         </div>
