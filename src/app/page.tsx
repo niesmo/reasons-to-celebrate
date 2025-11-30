@@ -10,6 +10,7 @@ import CelebrationCard from '../components/CelebrationCard';
 import InstallPrompt from '../components/InstallPrompt';
 import NotificationChecker from '../components/NotificationChecker';
 import UpcomingEvents from '../components/UpcomingEvents';
+import FilterControl from '../components/FilterControl';
 import { getSavedDates, saveDateWithName, deleteSavedDate, SavedDate } from '../utils/savedDatesStorage';
 
 export default function Home() {
@@ -20,6 +21,9 @@ export default function Home() {
   const [saveName, setSaveName] = useState<string>('');
   const [saveError, setSaveError] = useState<string>('');
   const [showSaveInput, setShowSaveInput] = useState<boolean>(false);
+  const [filterTypes, setFilterTypes] = useState<CelebrationDate['type'][]>([
+    'repdigit', 'palindrome', 'sequential', 'round'
+  ]);
 
   // Load saved dates on mount and check for URL params
   const searchParams = useSearchParams();
@@ -40,7 +44,7 @@ export default function Home() {
       if (nameParam) setActiveName(nameParam);
 
       const parsedDate = startOfDay(parseISO(dateParam));
-      const newCelebrations = getCelebrationDates(parsedDate);
+      const newCelebrations = getCelebrationDates(parsedDate, 50, filterTypes);
       setCelebrations(newCelebrations);
     } else {
       // Clear active name if no date param
@@ -60,7 +64,7 @@ export default function Home() {
 
     if (newDateStr) {
       const date = startOfDay(parseISO(newDateStr));
-      const newCelebrations = getCelebrationDates(date);
+      const newCelebrations = getCelebrationDates(date, 50, filterTypes);
       setCelebrations(newCelebrations);
 
       // Trigger confetti if we have results
@@ -76,6 +80,15 @@ export default function Home() {
       setCelebrations([]);
     }
   };
+
+  // Update celebrations when filters change
+  useEffect(() => {
+    if (dateStr) {
+      const date = startOfDay(parseISO(dateStr));
+      const newCelebrations = getCelebrationDates(date, 50, filterTypes);
+      setCelebrations(newCelebrations);
+    }
+  }, [filterTypes, dateStr]);
 
   const handleSaveDate = () => {
     if (!dateStr) {
@@ -176,6 +189,14 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Filter Control */}
+        {(dateStr || savedDates.length > 0) && (
+          <FilterControl
+            selectedTypes={filterTypes}
+            onChange={setFilterTypes}
+          />
+        )}
+
         {/* Save Date Button */}
         {dateStr && (
           <div className="flex justify-center mb-16">
@@ -231,7 +252,7 @@ export default function Home() {
             ))}
           </div>
         ) : savedDates.length > 0 ? (
-          <UpcomingEvents savedDates={savedDates} />
+          <UpcomingEvents savedDates={savedDates} filterTypes={filterTypes} />
         ) : (
           <div className="text-center text-slate-500 mt-12">
             <p>Select a date to begin the celebration...</p>

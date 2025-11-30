@@ -6,13 +6,14 @@ import CelebrationCard from './CelebrationCard';
 
 interface UpcomingEventsProps {
     savedDates: SavedDate[];
+    filterTypes: CelebrationDate['type'][];
 }
 
 interface UpcomingCelebration extends CelebrationDate {
     sourceName: string;
 }
 
-const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ savedDates }) => {
+const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ savedDates, filterTypes }) => {
     const [events, setEvents] = useState<UpcomingCelebration[]>([]);
 
     useEffect(() => {
@@ -23,7 +24,7 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ savedDates }) => {
             savedDates.forEach((saved) => {
                 const date = startOfDay(parseISO(saved.date));
                 // Get enough candidates to find upcoming ones
-                const celebrations = getCelebrationDates(date, 50);
+                const celebrations = getCelebrationDates(date, 50, filterTypes);
 
                 celebrations.forEach((celebration) => {
                     // Only include future dates or today
@@ -44,7 +45,7 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ savedDates }) => {
         };
 
         calculateUpcomingEvents();
-    }, [savedDates]);
+    }, [savedDates, filterTypes]);
 
     if (events.length === 0) {
         return null;

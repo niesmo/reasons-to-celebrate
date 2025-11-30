@@ -49,7 +49,11 @@ const isRound = (n: number): boolean => {
   return n % 100 === 0;
 };
 
-export const getCelebrationDates = (startDate: Date, count: number = 50): CelebrationDate[] => {
+export const getCelebrationDates = (
+  startDate: Date,
+  count: number = 50,
+  allowedTypes?: CelebrationDate['type'][]
+): CelebrationDate[] => {
   const candidates: CelebrationDate[] = [];
 
   // Calculate days from start date to today to avoid showing past dates
@@ -92,7 +96,8 @@ export const getCelebrationDates = (startDate: Date, count: number = 50): Celebr
       priority = 'Low';
     }
 
-    if (reason) {
+    // Filter based on allowed types if provided
+    if (reason && (!allowedTypes || allowedTypes.includes(type))) {
       candidates.push({
         date: addDays(startDate, days),
         daysFromStart: days,
