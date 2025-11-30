@@ -177,8 +177,8 @@ function HomeContent() {
         )}
 
         {/* Date Input Section */}
-        <div className="flex justify-center mb-8 px-4">
-          <div className="relative group w-full max-w-md">
+        <div className="flex justify-center mb-8 px-6">
+          <div className="relative group w-full max-w-md overflow-hidden rounded-lg">
             <div className="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
             <input
               type="date"
