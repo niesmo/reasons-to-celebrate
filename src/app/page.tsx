@@ -3,29 +3,60 @@
 import { useState, useEffect } from 'react';
 import { format, parseISO, startOfDay } from 'date-fns';
 import confetti from 'canvas-confetti';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getCelebrationDates, CelebrationDate } from '../utils/celebrationLogic';
 import CelebrationCard from '../components/CelebrationCard';
 import InstallPrompt from '../components/InstallPrompt';
 import NotificationChecker from '../components/NotificationChecker';
+import UpcomingEvents from '../components/UpcomingEvents';
 import { getSavedDates, saveDateWithName, deleteSavedDate, SavedDate } from '../utils/savedDatesStorage';
 
 export default function Home() {
   const [dateStr, setDateStr] = useState<string>('');
   const [celebrations, setCelebrations] = useState<CelebrationDate[]>([]);
   const [savedDates, setSavedDates] = useState<SavedDate[]>([]);
+  const [activeName, setActiveName] = useState<string>('');
   const [saveName, setSaveName] = useState<string>('');
   const [saveError, setSaveError] = useState<string>('');
   const [showSaveInput, setShowSaveInput] = useState<boolean>(false);
+
+  // Load saved dates on mount and check for URL params
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Load saved dates on mount
   useEffect(() => {
     setSavedDates(getSavedDates());
   }, []);
 
+  // Check for URL params to load a saved date
+  useEffect(() => {
+    const dateParam = searchParams.get('date');
+    const nameParam = searchParams.get('name');
+
+    if (dateParam) {
+      setDateStr(dateParam);
+      if (nameParam) setActiveName(nameParam);
+
+      const parsedDate = startOfDay(parseISO(dateParam));
+      const newCelebrations = getCelebrationDates(parsedDate);
+      setCelebrations(newCelebrations);
+    } else {
+      // Clear active name if no date param
+      setActiveName('');
+      // If we are clearing the date (e.g. "View All Upcoming"), clear the input and results
+      if (!dateParam && dateStr) {
+        setDateStr('');
+        setCelebrations([]);
+      }
+    }
+  }, [searchParams]);
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDateStr = e.target.value;
     setDateStr(newDateStr);
+    setActiveName(''); // Clear active name when manually changing date
 
     if (newDateStr) {
       const date = startOfDay(parseISO(newDateStr));
@@ -74,78 +105,61 @@ export default function Home() {
     }
   };
 
-  const handleLoadSavedDate = (date: string) => {
-    setDateStr(date);
-    const parsedDate = startOfDay(parseISO(date));
-    const newCelebrations = getCelebrationDates(parsedDate);
-    setCelebrations(newCelebrations);
+  const handleLoadSavedDate = (date: string, name: string) => {
+    router.push(`/?date=${date}&name=${encodeURIComponent(name)}`);
   };
 
   return (
     <main className="min-h-screen bg-slate-900 text-slate-100 p-8 md:p-24">
       <div className="max-w-5xl mx-auto">
-        <div className="flex justify-end mb-8">
-          <Link
-            href="/about"
-            className="text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2 group hover:underline"
-          >
-            <span className="font-medium">About</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 transform group-hover:translate-x-1 transition-transform"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </Link>
+        <div className="flex justify-end mb-8 h-8">
+          {/* Spacer to keep layout consistent if needed, or just remove the div entirely if preferred. 
+              Keeping a small spacer for now to avoid layout shift if the header relies on top padding. 
+              Actually, let's just remove the link but keep the container for spacing if the design expects it,
+              or better yet, remove the container if it's empty. 
+              Looking at the code, it's just a flex container. I'll remove the link content. */}
         </div>
 
         <header className="text-center mb-16">
           <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 mb-6 animate-pulse">
-            Reasons to Celebrate
+            {activeName ? `Celebrating ${activeName}` : 'Reasons to Celebrate'}
           </h1>
           <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Every day counts. Enter a significant date to discover the hidden aesthetic milestones in your timeline.
+            {activeName
+              ? `Discovering aesthetic milestones for ${format(parseISO(dateStr), 'MMMM do, yyyy')}`
+              : 'Every day counts. Enter a significant date to discover the hidden aesthetic milestones in your timeline.'}
           </p>
         </header>
 
-        {/* Saved Dates Section */}
+        {/* Saved Dates Section (Compact) */}
         {savedDates.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-4 text-slate-200">Saved Dates</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {savedDates.map((saved) => (
-                <div
-                  key={saved.id}
-                  className="bg-slate-800 rounded-lg p-4 hover:bg-slate-750 transition-colors cursor-pointer group relative"
-                  onClick={() => handleLoadSavedDate(saved.date)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-white mb-1">{saved.name}</h3>
-                      <p className="text-sm text-slate-400">{format(parseISO(saved.date), 'MMMM d, yyyy')}</p>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteDate(saved.id);
-                      }}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-300 p-1"
-                      aria-label="Delete"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
+          <div className="mb-12 flex flex-wrap justify-center gap-3 max-w-4xl mx-auto px-4">
+            {savedDates.map((saved) => (
+              <div
+                key={saved.id}
+                className={`flex-shrink-0 rounded-full px-4 py-2 cursor-pointer transition-all border ${saved.name === activeName
+                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg scale-105'
+                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600'
+                  }`}
+                onClick={() => handleLoadSavedDate(saved.date, saved.name)}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-sm">{saved.name}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteDate(saved.id);
+                    }}
+                    className="text-slate-400 hover:text-red-400 transition-colors p-0.5 rounded-full hover:bg-white/10"
+                    aria-label="Delete"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -216,6 +230,8 @@ export default function Home() {
               <CelebrationCard key={index} celebration={celebration} />
             ))}
           </div>
+        ) : savedDates.length > 0 ? (
+          <UpcomingEvents savedDates={savedDates} />
         ) : (
           <div className="text-center text-slate-500 mt-12">
             <p>Select a date to begin the celebration...</p>
@@ -224,7 +240,7 @@ export default function Home() {
       </div>
       <InstallPrompt />
       <NotificationChecker />
-    </main>
+    </main >
   );
 }
 

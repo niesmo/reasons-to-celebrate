@@ -6,9 +6,10 @@ import ReminderButton from './ReminderButton';
 
 interface CelebrationCardProps {
     celebration: CelebrationDate;
+    sourceName?: string;
 }
 
-const CelebrationCard: React.FC<CelebrationCardProps> = ({ celebration }) => {
+const CelebrationCard: React.FC<CelebrationCardProps> = ({ celebration, sourceName }) => {
     const { date, daysFromStart, reason, type } = celebration;
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -81,6 +82,11 @@ const CelebrationCard: React.FC<CelebrationCardProps> = ({ celebration }) => {
                 <div className="mb-4 text-lg font-medium opacity-95">
                     {format(date, 'MMMM do, yyyy')}
                 </div>
+                {sourceName && (
+                    <div className="mb-2 text-sm font-semibold text-white/90 bg-white/10 inline-block px-2 py-1 rounded">
+                        From: {sourceName}
+                    </div>
+                )}
                 <div className="text-sm opacity-90 italic mb-4">
                     "{reason}"
                 </div>

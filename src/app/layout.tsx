@@ -32,6 +32,10 @@ export const viewport = {
   themeColor: "#8b5cf6",
 };
 
+import Navigation from "../components/Navigation";
+
+// ... existing code ...
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -50,6 +54,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Navigation />
         {children}
         <Analytics />
         <script
