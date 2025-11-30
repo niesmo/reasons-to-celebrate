@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { format, parseISO, startOfDay } from 'date-fns';
 import confetti from 'canvas-confetti';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -13,7 +13,7 @@ import UpcomingEvents from '../components/UpcomingEvents';
 import FilterControl from '../components/FilterControl';
 import { getSavedDates, saveDateWithName, deleteSavedDate, SavedDate } from '../utils/savedDatesStorage';
 
-export default function Home() {
+function HomeContent() {
   const [dateStr, setDateStr] = useState<string>('');
   const [celebrations, setCelebrations] = useState<CelebrationDate[]>([]);
   const [savedDates, setSavedDates] = useState<SavedDate[]>([]);
@@ -262,6 +262,27 @@ export default function Home() {
       <InstallPrompt />
       <NotificationChecker />
     </main >
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-slate-900 text-slate-100 p-8 md:p-24">
+        <div className="max-w-5xl mx-auto">
+          <header className="text-center mb-16">
+            <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 mb-6 animate-pulse">
+              Reasons to Celebrate
+            </h1>
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+              Loading...
+            </p>
+          </header>
+        </div>
+      </main>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
 
