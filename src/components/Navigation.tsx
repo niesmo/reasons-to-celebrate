@@ -86,6 +86,13 @@ const Navigation = () => {
                             >
                                 About
                             </Link>
+                            <Link
+                                href="/how-to"
+                                className={`block px-4 py-3 rounded-lg transition-colors ${pathname === '/how-to' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                                    }`}
+                            >
+                                How to Use
+                            </Link>
                         </div>
 
                         <div className="border-t border-slate-800 pt-6">
